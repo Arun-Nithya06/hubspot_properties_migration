@@ -111,8 +111,12 @@ async function bootstrap() {
   await app.listen(port);
 }
 
-void bootstrap().then(() =>
+void bootstrap().then(() => {
+  const swaggerUrl = `http://localhost:${port}/api/v1/doc`;
   Logger.log(
     `🚀 Express app server running on port ${port} in ${startCase(nodeEnv)} mode`,
-  ),
-);
+  );
+  Logger.log(
+    `📄 Swagger documentation available (Ctrl+Click to open): ${swaggerUrl}`,
+  );
+});

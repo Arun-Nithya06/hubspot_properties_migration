@@ -101,10 +101,12 @@ export class HubspotService {
     token: string,
   ): Promise<void> {
     this.logger.log(`[ENTER] createOrUpdateProperty name:${prop.name}`);
-    let hubspotAccountId = token;
+    let hubspotAccountId;
 
     try {
       await this.hubspotAPIService.setApiKey(token);
+      const accountInfo = await this.hubspotAPIService.getAccountInfo(token);
+      hubspotAccountId = accountInfo.portalId || accountInfo.hubId;
 
       await this.ensureGroup(prop.objectType, prop.groupName);
 

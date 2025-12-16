@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Client } from '@hubspot/api-client';
+import axios from 'axios';
 
 @Injectable()
 export class HubspotAPIService {
   private readonly logger = new Logger(HubspotAPIService.name);
   private hubspotClient: Client;
+  private readonly baseUrl = 'https://api.hubapi.com';
 
   constructor() {}
 
@@ -18,16 +20,30 @@ export class HubspotAPIService {
   }
 
   /**
-   * Get Hub ID
+   * Get HubSpot account info
    * @param token
-   * @returns promise<OAuthAccessTokenResponse>
+   * @returns promise<any>
    */
-  async getHubId(token: string) {
+  public async getAccountInfo(accessToken: string) {
     try {
-      return await this.hubspotClient.oauth.accessTokensApi.get(token);
-    } catch (e) {
-      this.logger.error('Failed to fetch portal ID', e);
-      throw e;
+      const response = await axios.get(
+        `${this.baseUrl}/account-info/v3/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const data = response.data;
+      return data;
+    } catch (error) {
+      this.logger.error(
+        'Failed to fetch HubSpot account info',
+        error.response?.data || error.message,
+      );
+      throw error;
     }
   }
 
