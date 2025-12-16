@@ -18,11 +18,24 @@ export class HubspotAPIService {
   }
 
   /**
+   * Get Hub ID
+   * @param token
+   * @returns promise<OAuthAccessTokenResponse>
+   */
+  async getHubId(token: string) {
+    try {
+      return await this.hubspotClient.oauth.accessTokensApi.get(token);
+    } catch (e) {
+      this.logger.error('Failed to fetch portal ID', e);
+      throw e;
+    }
+  }
+
+  /**
    * Get hubSpot property groups
    * @param objectType
-   * @returns
+   * @returns promise<CollectionResponsePropertyGroupNoPaging>
    */
-
   async getGroups(objectType: string) {
     this.logger.debug(`getGroups objectType=${objectType}`);
     try {
@@ -42,7 +55,7 @@ export class HubspotAPIService {
    * Create hubSpot property group
    * @param objectType
    * @param groupName
-   * @returns
+   * @returns promise<PropertyGroup>
    */
   async createGroup(objectType: string, groupName: string) {
     this.logger.debug(
@@ -69,7 +82,7 @@ export class HubspotAPIService {
   /**
    * Get hubSpot properties
    * @param objectType
-   * @returns
+   * @returns - promise<CollectionResponsePropertyNoPaging>
    */
   async getProperties(objectType: string) {
     this.logger.debug(`getProperties objectType=${objectType}`);
@@ -92,11 +105,11 @@ export class HubspotAPIService {
    * Create hubSpot property
    * @param objectType
    * @param payload
-   * @returns
+   * @returns promise<Property>
    */
   async createProperty(objectType: string, payload: any) {
     this.logger.debug(
-      `createProperty objectType=${objectType} name=${payload.name}`,
+      `createProperty objectType:${objectType} name:${payload.name}`,
     );
     try {
       const result = await this.hubspotClient.crm.properties.coreApi.create(

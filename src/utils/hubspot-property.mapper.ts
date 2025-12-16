@@ -3,12 +3,19 @@ import {
   HubspotRawTypeEnum,
   HubspotPropertyTypeEnum,
   HubspotFieldTypeEnum,
+  YesNoEnum,
 } from 'src/modules/hubspot/enum/hubspot-property.enums';
-import { HubSpotProperty } from 'src/modules/hubspot/interfaces/hubspot.inerface';
+import { HubSpotProperty } from 'src/modules/hubspot/interfaces/hubspot-property.interface';
 
 export const mapRowToHubspotProperty = (row: any): HubSpotProperty => {
   const rawType = row['Type']?.toLowerCase() as HubspotRawTypeEnum;
-  const isMulti = row['Multiple']?.toLowerCase() === 'yes';
+  const multipleRaw = row['Multiple'];
+  const isMulti = multipleRaw
+    ? typeof multipleRaw === 'boolean'
+      ? multipleRaw
+      : multipleRaw.toString().trim().toLowerCase() ===
+        YesNoEnum.YES.toLowerCase()
+    : false;
 
   let type: HubspotPropertyTypeEnum;
   let fieldType: HubspotFieldTypeEnum;
@@ -80,7 +87,7 @@ export const parseDropdownOptions = (value?: string) => {
   if (!value) return [];
 
   return value
-    .split(',')
+    .split(/[,;]/) // split by comma OR semicolon
     .map((v) => v.trim())
     .filter(Boolean)
     .map((v) => ({
